@@ -1,0 +1,37 @@
+name: Java CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Make mvnw executable
+        working-directory: java-assignment
+        run: chmod +x mvnw
+
+      - name: Build & Run Unit Tests with JaCoCo Coverage Check (>80%)
+        working-directory: java-assignment
+        run: ./mvnw clean test -Dnet.bytebuddy.experimental=true
+
+      - name: Upload JaCoCo Coverage Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jacoco-coverage-report
+          path: java-assignment/target/site/jacoco/
