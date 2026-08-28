@@ -2,6 +2,7 @@ package com.fulfilment.application.monolith.stores;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -22,7 +23,22 @@ public class StoreEndpointTest {
         .statusCode(200)
         .body(containsString("TONSTAD"), containsString("KALLAX"), containsString("BESTÅ"));
 
-    // 2. Create a new store
+    // 2. GET single store by ID
+    given()
+        .when()
+        .get(path + "/1")
+        .then()
+        .statusCode(200)
+        .body(containsString("TONSTAD"));
+
+    // 3. GET single non-existent store (404)
+    given()
+        .when()
+        .get(path + "/99999")
+        .then()
+        .statusCode(404);
+
+    // 4. Create a new store
     Store newStore = new Store("ROTTERDAM-STORE");
     newStore.quantityProductsInStock = 25;
 
@@ -35,12 +51,84 @@ public class StoreEndpointTest {
         .statusCode(201)
         .body(containsString("ROTTERDAM-STORE"));
 
-    // 3. Verify it appears in the list
+    // 5. Create with ID invalid (422)
+    Store invalidStore = new Store("INVALID-STORE");
+    invalidStore.id = 999L;
     given()
+        .contentType(ContentType.JSON)
+        .body(invalidStore)
         .when()
-        .get(path)
+        .post(path)
+        .then()
+        .statusCode(422);
+
+    // 6. PUT update store
+    Store updateStore = new Store("TONSTAD-UPDATED");
+    updateStore.quantityProductsInStock = 50;
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(updateStore)
+        .when()
+        .put(path + "/1")
         .then()
         .statusCode(200)
-        .body(containsString("ROTTERDAM-STORE"));
+        .body(containsString("TONSTAD-UPDATED"));
+
+    // 7. PUT with null name (422)
+    Store nullNameStore = new Store(null);
+    given()
+        .contentType(ContentType.JSON)
+        .body(nullNameStore)
+        .when()
+        .put(path + "/1")
+        .then()
+        .statusCode(422);
+
+    // 8. PUT non-existent store (404)
+    given()
+        .contentType(ContentType.JSON)
+        .body(updateStore)
+        .when()
+        .put(path + "/99999")
+        .then()
+        .statusCode(404);
+
+    // 9. PATCH store
+    Store patchStore = new Store("TONSTAD-PATCHED");
+    patchStore.quantityProductsInStock = 75;
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(patchStore)
+        .when()
+        .patch(path + "/1")
+        .then()
+        .statusCode(200)
+        .body(containsString("TONSTAD-PATCHED"));
+
+    // 10. PATCH non-existent store (404)
+    given()
+        .contentType(ContentType.JSON)
+        .body(patchStore)
+        .when()
+        .patch(path + "/99999")
+        .then()
+        .statusCode(404);
+
+    // 11. DELETE store
+    given()
+        .when()
+        .delete(path + "/3")
+        .then()
+        .statusCode(204);
+
+    // 12. DELETE non-existent store (404)
+    given()
+        .when()
+        .delete(path + "/99999")
+        .then()
+        .statusCode(404);
   }
 }
+

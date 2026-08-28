@@ -1,87 +1,82 @@
-# Java Code Assignment
+# Warehouse Colocation & Fulfillment System
 
-This is a short code assignment that explores various aspects of software development, including API implementation, documentation, persistence layer handling, and testing.
+A Quarkus-based Java application for managing warehouses, stores, products, and fulfillment routing.
 
-## About the assignment
+## Overview & Architecture
 
-You will find the tasks of this assignment on [CODE_ASSIGNMENT](CODE_ASSIGNMENT.md) file
+The codebase follows Hexagonal Architecture (Ports & Adapters) and Domain-Driven Design (DDD):
 
-## About the code base
+- **Location**: Manages location lookups and checks location capacity limits.
+- **Store**: Handles store CRUD and synchronizes with legacy systems after database transaction commits (`@Observes(during = TransactionPhase.AFTER_SUCCESS)`).
+- **Product**: Handles product inventory management.
+- **Warehouse**: Manages warehouse creation, replacement, and soft-archiving. Validation logic is encapsulated in `WarehouseValidator`.
+- **Fulfillment**: Enforces routing constraints between products, stores, and warehouses (`FulfillmentValidator`).
 
-This is based on https://github.com/quarkusio/quarkus-quickstarts
+## Package Structure
+
+```
+com.fulfilment.application.monolith
+├── location/           # LocationResolver port & gateway
+├── stores/             # Store entity, resource, and legacy sync observer
+├── products/           # Product entity, repository, and resource
+├── warehouses/
+│   ├── domain/
+│   │   ├── models/     # Warehouse, Location
+│   │   ├── ports/      # WarehouseStore, operation interfaces
+│   │   ├── validators/ # WarehouseValidator
+│   │   └── usecases/   # Create, Replace, Archive use cases
+│   └── adapters/
+│       ├── database/   # DbWarehouse, WarehouseRepository
+│       └── restapi/    # WarehouseResourceImpl
+└── fulfillment/
+    ├── domain/
+        ├── models/     # ProductStoreFulfillment
+        ├── validators/ # FulfillmentValidator
+        └── usecases/   # FulfillmentService
+```
+
+## Key Business Rules
+
+1. **Warehouse Replacement**:
+   - Replacement capacity must accommodate existing stock.
+   - Replacement stock must match the old warehouse stock.
+   - Old warehouse is soft-archived with `archivedAt` timestamp to preserve historical data.
+
+2. **Fulfillment Constraints**:
+   - Max 2 warehouses per product per store.
+   - Max 3 warehouses per store.
+   - Max 5 product types per warehouse.
+
+## How to Run
 
 ### Requirements
-
-To compile and run this demo you will need:
-
 - JDK 17+
 
-In addition, you will need either a PostgreSQL database, or Docker to run one.
-
-### Configuring JDK 17+
-
-Make sure that `JAVA_HOME` environment variables has been set, and that a JDK 17+ `java` command is on the path.
-
-## Building the demo
-
-Execute the Maven build on the root of the project:
-
-```sh
-./mvnw package
+### Run Tests & Code Coverage
+```bash
+./mvnw test
 ```
+*JaCoCo coverage report is generated at `target/site/jacoco/index.html`.*
 
-## Running the demo
-
-### Live coding with Quarkus
-
-The Maven Quarkus plugin provides a development mode that supports
-live coding. To try this out:
-
-```sh
+### Run in Dev Mode
+```bash
 ./mvnw quarkus:dev
 ```
+Swagger UI will be available at: `http://localhost:8080/q/swagger-ui`
 
-In this mode you can make changes to the code and have the changes immediately applied, by just refreshing your browser.
+## Screenshots
 
-    Hot reload works even when modifying your JPA entities.
-    Try it! Even the database schema will be updated on the fly.
+### 1. JaCoCo Code Coverage Report (>80%)
+![Code Coverage Report](screenshots/Screenshot%202026-08-28%20145318.png)
+![Coverage Details](screenshots/Screenshot%202026-08-28%20145337.png)
 
-## (Optional) Run Quarkus in JVM mode
+### 2. Test Suite Execution & Build Success
+![Test Execution](screenshots/Screenshot%202026-08-28%20145610.png)
+![Build Success](screenshots/Screenshot%202026-08-28%20145835.png)
 
-When you're done iterating in developer mode, you can run the application as a conventional jar file.
+### 3. Swagger UI API Documentation
+![Swagger UI](screenshots/screencapture-localhost-8080-q-swagger-ui-2026-08-28-15_08_19.png)
 
-First compile it:
-
-```sh
-./mvnw package
-```
-
-Next we need to make sure you have a PostgreSQL instance running (Quarkus automatically starts one for dev and test mode). To set up a PostgreSQL database with Docker:
-
-```sh
-docker run -it --rm=true --name quarkus_test -e POSTGRES_USER=quarkus_test -e POSTGRES_PASSWORD=quarkus_test -e POSTGRES_DB=quarkus_test -p 15432:5432 postgres:13.3
-```
-
-Connection properties for the Agroal datasource are defined in the standard Quarkus configuration file,
-`src/main/resources/application.properties`.
-
-Then run it:
-
-```sh
-java -jar ./target/quarkus-app/quarkus-run.jar
-```
-    Have a look at how fast it boots.
-    Or measure total native memory consumption...
-
-
-## See the demo in your browser
-
-Navigate to:
-
-<http://localhost:8080/index.html>
-
-Have fun, and join the team of contributors!
-
-## Troubleshooting
-
-Using **IntelliJ**, in case the generated code is not recognized and you have compilation failures, you may need to add `target/.../jaxrs` folder as "generated sources".
+### 4. Quarkus Dev UI & Application Dashboard
+![Quarkus Dev UI](screenshots/screencapture-localhost-8080-q-dev-ui-extensions-2026-08-28-14_57_38.png)
+![Application Landing Page](screenshots/screencapture-localhost-8080-2026-08-28-14_57_22.png)

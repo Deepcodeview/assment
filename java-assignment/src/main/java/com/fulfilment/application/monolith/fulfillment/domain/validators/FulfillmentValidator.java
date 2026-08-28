@@ -1,17 +1,20 @@
-package com.fulfilment.application.monolith.fulfillment;
+package com.fulfilment.application.monolith.fulfillment.domain.validators;
 
+import com.fulfilment.application.monolith.fulfillment.domain.models.ProductStoreFulfillment;
 import jakarta.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
-public class FulfillmentService {
+public class FulfillmentValidator {
 
-  private final List<ProductStoreFulfillment> fulfillments = new ArrayList<>();
-
-  public void associateFulfillment(String businessUnitCode, Long productId, Long storeId) {
+  public void validateAssociation(
+      String businessUnitCode,
+      Long productId,
+      Long storeId,
+      List<ProductStoreFulfillment> fulfillments) {
     if (businessUnitCode == null || productId == null || storeId == null) {
-      throw new IllegalArgumentException("Business unit code, product ID, and store ID are required.");
+      throw new IllegalArgumentException(
+          "Business unit code, product ID, and store ID are required.");
     }
 
     boolean alreadyAssociated =
@@ -73,13 +76,5 @@ public class FulfillmentService {
     if (!productAlreadyInWarehouse && productTypesInWarehouse >= 5) {
       throw new IllegalArgumentException("Warehouse cannot store more than 5 types of products.");
     }
-
-    if (!alreadyAssociated) {
-      fulfillments.add(new ProductStoreFulfillment(businessUnitCode, productId, storeId));
-    }
-  }
-
-  public List<ProductStoreFulfillment> getFulfillments() {
-    return new ArrayList<>(fulfillments);
   }
 }

@@ -3,6 +3,7 @@ package com.fulfilment.application.monolith.warehouses.domain.usecases;
 import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import com.fulfilment.application.monolith.warehouses.domain.ports.ArchiveWarehouseOperation;
 import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStore;
+import com.fulfilment.application.monolith.warehouses.domain.validators.WarehouseValidator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
@@ -11,25 +12,24 @@ import java.time.LocalDateTime;
 public class ArchiveWarehouseUseCase implements ArchiveWarehouseOperation {
 
   private final WarehouseStore warehouseStore;
+  private final WarehouseValidator warehouseValidator;
 
   @Inject
-  public ArchiveWarehouseUseCase(WarehouseStore warehouseStore) {
+  public ArchiveWarehouseUseCase(
+      WarehouseStore warehouseStore, WarehouseValidator warehouseValidator) {
     this.warehouseStore = warehouseStore;
+    this.warehouseValidator = warehouseValidator;
+  }
+
+  public ArchiveWarehouseUseCase(WarehouseStore warehouseStore) {
+    this(warehouseStore, new WarehouseValidator());
   }
 
   @Override
   public void archive(Warehouse warehouse) {
-    if (warehouse == null || warehouse.businessUnitCode == null) {
-      throw new IllegalArgumentException("Warehouse business unit code is required.");
-    }
-
-    Warehouse existing = warehouseStore.findByBusinessUnitCode(warehouse.businessUnitCode);
-    if (existing == null) {
-      throw new IllegalArgumentException(
-          "Warehouse with code " + warehouse.businessUnitCode + " not found or already archived.");
-    }
-
+    Warehouse existing = warehouseValidator.validateForArchive(warehouse, warehouseStore);
     existing.archivedAt = LocalDateTime.now();
     warehouseStore.update(existing);
   }
 }
+

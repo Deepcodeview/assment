@@ -40,6 +40,10 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-postgresql</artifactId>
         </dependency>
 
@@ -57,6 +61,22 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -145,6 +165,14 @@
                                     <element>PACKAGE</element>
                                     <includes>
                                         <include>com.fulfilment.application.monolith.warehouses.domain.usecases</include>
+                                        <include>com.fulfilment.application.monolith.warehouses.domain.validators</include>
+                                        <include>com.fulfilment.application.monolith.warehouses.domain.models</include>
+                                        <include>com.fulfilment.application.monolith.warehouses.adapters.restapi</include>
+                                        <include>com.fulfilment.application.monolith.fulfillment.domain.usecases</include>
+                                        <include>com.fulfilment.application.monolith.fulfillment.domain.validators</include>
+                                        <include>com.fulfilment.application.monolith.fulfillment.domain.models</include>
+                                        <include>com.fulfilment.application.monolith.location</include>
+                                        <include>com.fulfilment.application.monolith.products</include>
                                     </includes>
                                     <limits>
                                         <limit>

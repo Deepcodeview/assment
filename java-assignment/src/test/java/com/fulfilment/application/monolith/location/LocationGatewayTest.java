@@ -11,13 +11,10 @@ public class LocationGatewayTest {
 
   @Test
   public void testWhenResolveExistingLocationShouldReturn() {
-    // given
     LocationGateway locationGateway = new LocationGateway();
 
-    // when
     Location location = locationGateway.resolveByIdentifier("ZWOLLE-001");
 
-    // then
     assertNotNull(location);
     assertEquals("ZWOLLE-001", location.identification);
     assertEquals(1, location.maxNumberOfWarehouses);
@@ -26,13 +23,9 @@ public class LocationGatewayTest {
 
   @Test
   public void testWhenResolveNonExistingLocationShouldReturnNull() {
-    // given
     LocationGateway locationGateway = new LocationGateway();
 
-    // when
-    Location location = locationGateway.resolveByIdentifier("UNKNOWN-999");
-
-    // then
-    assertNull(location);
+    assertNull(locationGateway.resolveByIdentifier("UNKNOWN-999"));
+    assertNull(locationGateway.resolveByIdentifier(null));
   }
 }
