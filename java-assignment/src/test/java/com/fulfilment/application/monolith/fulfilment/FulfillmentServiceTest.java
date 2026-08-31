@@ -1,10 +1,9 @@
-package com.fulfilment.application.monolith.fulfillment;
+package com.fulfilment.application.monolith.fulfilment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fulfilment.application.monolith.fulfillment.domain.models.ProductStoreFulfillment;
-import com.fulfilment.application.monolith.fulfillment.domain.usecases.FulfillmentService;
+import com.fulfilment.application.monolith.fulfilment.domain.models.ProductStoreFulfillment;
+import com.fulfilment.application.monolith.fulfilment.domain.usecases.FulfillmentService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

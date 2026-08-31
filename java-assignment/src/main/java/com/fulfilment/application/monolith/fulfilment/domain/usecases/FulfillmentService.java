@@ -1,14 +1,15 @@
-package com.fulfilment.application.monolith.fulfillment.domain.usecases;
+package com.fulfilment.application.monolith.fulfilment.domain.usecases;
 
-import com.fulfilment.application.monolith.fulfillment.domain.models.ProductStoreFulfillment;
-import com.fulfilment.application.monolith.fulfillment.domain.validators.FulfillmentValidator;
+import com.fulfilment.application.monolith.fulfilment.domain.models.ProductStoreFulfillment;
+import com.fulfilment.application.monolith.fulfilment.domain.ports.AssociateFulfillmentOperation;
+import com.fulfilment.application.monolith.fulfilment.domain.validators.FulfillmentValidator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
-public class FulfillmentService {
+public class FulfillmentService implements AssociateFulfillmentOperation {
 
   private final List<ProductStoreFulfillment> fulfillments = new ArrayList<>();
   private final FulfillmentValidator validator;
@@ -22,6 +23,7 @@ public class FulfillmentService {
     this(new FulfillmentValidator());
   }
 
+  @Override
   public void associateFulfillment(String businessUnitCode, Long productId, Long storeId) {
     validator.validateAssociation(businessUnitCode, productId, storeId, fulfillments);
 
@@ -38,6 +40,7 @@ public class FulfillmentService {
     }
   }
 
+  @Override
   public List<ProductStoreFulfillment> getFulfillments() {
     return new ArrayList<>(fulfillments);
   }

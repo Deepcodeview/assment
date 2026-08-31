@@ -1,6 +1,6 @@
-package com.fulfilment.application.monolith.fulfillment.domain.validators;
+package com.fulfilment.application.monolith.fulfilment.domain.validators;
 
-import com.fulfilment.application.monolith.fulfillment.domain.models.ProductStoreFulfillment;
+import com.fulfilment.application.monolith.fulfilment.domain.models.ProductStoreFulfillment;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
